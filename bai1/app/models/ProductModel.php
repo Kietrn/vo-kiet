@@ -9,10 +9,11 @@ class ProductModel
     }
     public function getProducts()
     {
-        $query = "SELECT p.id, p.name, p.description, p.price, p.image, c.name as
-category_name
+        $query = "SELECT p.id, p.name, p.description, p.price, c.name as category_name
+
 FROM " . $this->table_name . " p
 LEFT JOIN category c ON p.category_id = c.id";
+
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -20,17 +21,14 @@ LEFT JOIN category c ON p.category_id = c.id";
     }
     public function getProductById($id)
     {
-        $query = "SELECT p.*, c.name as category_name
-FROM " . $this->table_name . " p
-LEFT JOIN category c ON p.category_id = c.id
-WHERE p.id = :id";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         return $result;
     }
-    public function addProduct($name, $description, $price, $category_id, $image)
+    public function addProduct($name, $description, $price, $category_id)
     {
         $errors = [];
         if (empty($name)) {
@@ -46,46 +44,35 @@ WHERE p.id = :id";
             return $errors;
         }
         $query = "INSERT INTO " . $this->table_name . " (name, description, price,
-category_id, image) VALUES (:name, :description, :price, :category_id, :image)";
+category_id) VALUES (:name, :description, :price, :category_id)";
         $stmt = $this->conn->prepare($query);
         $name = htmlspecialchars(strip_tags($name));
         $description = htmlspecialchars(strip_tags($description));
         $price = htmlspecialchars(strip_tags($price));
         $category_id = htmlspecialchars(strip_tags($category_id));
-        $image = htmlspecialchars(strip_tags($image));
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':price', $price);
         $stmt->bindParam(':category_id', $category_id);
-        $stmt->bindParam(':image', $image);
         if ($stmt->execute()) {
             return true;
         }
         return false;
     }
-    public function updateProduct(
-        $id,
-        $name,
-        $description,
-        $price,
-        $category_id,
-        $image
-    ) {
+    public function updateProduct($id, $name, $description, $price, $category_id)
+    {
         $query = "UPDATE " . $this->table_name . " SET name=:name,
-description=:description, price=:price, category_id=:category_id, image=:image WHERE
-id=:id";
+description=:description, price=:price, category_id=:category_id WHERE id=:id";
         $stmt = $this->conn->prepare($query);
         $name = htmlspecialchars(strip_tags($name));
         $description = htmlspecialchars(strip_tags($description));
         $price = htmlspecialchars(strip_tags($price));
         $category_id = htmlspecialchars(strip_tags($category_id));
-        $image = htmlspecialchars(strip_tags($image));
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':price', $price);
         $stmt->bindParam(':category_id', $category_id);
-        $stmt->bindParam(':image', $image);
         if ($stmt->execute()) {
             return true;
         }

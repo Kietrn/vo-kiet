@@ -15,5 +15,4 @@ class CategoryModel
         $result = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $result;
     }
-    
 }
